@@ -9,9 +9,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.listycity.ui.theme.ListyCityTheme
+
+class CityRepository {
+    //
+    private val _cities = mutableStateListOf(
+        "Edmonton", "Vancouver", "Moscow",
+        "Sydney", "Berlin", "Vienna",
+        "Tokyo", "Beijing", "Osaka",
+        "New Delhi"
+    )
+
+    val cities: List<String>
+        get() = _cities
+}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
