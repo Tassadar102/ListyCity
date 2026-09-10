@@ -32,10 +32,8 @@ import androidx.compose.runtime.setValue
 class CityRepository {
     //
     private val _cities = mutableStateListOf(
-        "Edmonton", "Vancouver", "Moscow",
-        "Sydney", "Berlin", "Vienna",
-        "Tokyo", "Beijing", "Osaka",
-        "New Delhi"
+        "Minas Tirith", "Minas Morgul", "The Shire",
+        "Baradur", "Osgiliath", "Lothlorien"
     )
 
     val cities: List<String> get() = _cities
@@ -44,7 +42,17 @@ class CityRepository {
         //
         _cities.add(city)
     }
+
+    fun removeCity(city: String) {
+        /* This method removes a city from the array.
+         * city: is a String matching a city already in the array.
+         */
+        if (_cities.isNotEmpty()) {
+            _cities.remove(city)
+        }
+    }
 }
+
 
 @Composable
 fun CityListScreen(
@@ -53,31 +61,55 @@ fun CityListScreen(
     onAddCity: (String) -> Unit
 ) {
     var newCityName by remember {mutableStateOf("") }
+    var showNewCity by remember {mutableStateOf(false)}
 
     Column(modifier = modifier.fillMaxSize()) {
         Row(modifier = Modifier.padding(16.dp)) {
-            OutlinedTextField(
-                value = newCityName,
-                onValueChange = { newCityName = it },
-                label = { Text("City name") },
-                modifier = Modifier.weight(1f)
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
+            // City adder button.
             Button(
                 onClick = {
-                    if (newCityName.isNotBlank()) {
-                        onAddCity(newCityName)
-                        newCityName = ""
-                    }
+                    showNewCity = true
                 }
             ) {
                 Text("Add City")
             }
+            // City Deleter Button.
+            Button(
+                onClick = {
+                    //if (newCityName.isNotBlank()) {
+                    //    onAddCity(newCityName)
+                    //    newCityName = ""
+                    //}
+                }
+            ) {
+                Text("Remove City")
+            }
         }
+        if (showNewCity) {
+            Row(modifier = Modifier.padding(16.dp)) {
+                OutlinedTextField(
+                    value = newCityName,
+                    onValueChange = { newCityName = it },
+                    label = { Text("City name") },
+                    modifier = Modifier.weight(1f)
+                )
+                Button(
+                    onClick = {
+                        if (newCityName.isNotBlank()) {
+                            onAddCity(newCityName)
+                            newCityName = ""
+                        }
+                        showNewCity = false
+                    }
+                ) {
+                    Text("Confirm")
+                }
+            }
+        }
+        //Spacer(modifier = Modifier.width(8.dp))
 
-        LazyColumn(modifier = modifier.fillMaxSize()) {
+        LazyColumn(modifier = modifier
+            .fillMaxSize()) {
             //
             //
             items(cities) { city ->
@@ -113,13 +145,14 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding),
                         onAddCity = { cityRepository.addCity(it) }
                     )
+                    //cityRepository.removeCity("Minas Morgul")
                 }
             }
         }
     }
 }
 
-@Composable
+/*@Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
         text = "Hello $name!",
@@ -134,3 +167,4 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
+*/
