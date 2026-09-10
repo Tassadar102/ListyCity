@@ -115,7 +115,6 @@ fun CityListScreen(
             //
             items(cities) { city ->
                 CityRow(city = city)
-                Text(text=city.isSelected.toString())
             }
         }
     }
