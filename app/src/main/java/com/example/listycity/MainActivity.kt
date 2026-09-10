@@ -1,5 +1,6 @@
 package com.example.listycity
 
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -30,7 +31,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 
-data class City(val name: String, var isSelected: Boolean = false)
+data class City(val name: String) {
+    var isSelected by mutableStateOf(false)
+}
 class CityRepository {
     //
     private val _cities = mutableStateListOf(
@@ -65,7 +68,7 @@ fun CityListScreen(
     var showNewCity by remember {mutableStateOf(false)}
 
     Column(modifier = modifier.fillMaxSize()) {
-        Row(modifier = Modifier.padding(16.dp)) {
+        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
             // City adder button.
             Button(
                 onClick = {
@@ -77,10 +80,6 @@ fun CityListScreen(
             // City Deleter Button.
             Button(
                 onClick = {
-                    //if (newCityName.isNotBlank()) {
-                    //    onAddCity(newCityName)
-                    //    newCityName = ""
-                    //}
                     onRemoveCity()
                 }
             ) {
@@ -108,7 +107,6 @@ fun CityListScreen(
                 }
             }
         }
-        //Spacer(modifier = Modifier.width(8.dp))
 
         LazyColumn(modifier = modifier
             .fillMaxSize()
@@ -134,7 +132,9 @@ fun CityRow(city: City) {
             .background(if (city.isSelected) Color.LightGray else Color.Transparent) // I had to fight this inline if statement.
             .selectable(
                 selected = city.isSelected,
-                onClick = { city.isSelected = !city.isSelected })
+                onClick = {
+                    city.isSelected = !city.isSelected
+                })
     )
 }
 
@@ -144,8 +144,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         val cityRepository = CityRepository()
         setContent {
-
-            //Text("Hello World!")
             ListyCityTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     CityListScreen(
@@ -154,7 +152,6 @@ class MainActivity : ComponentActivity() {
                         onAddCity = { cityRepository.addCity(it) },
                         onRemoveCity = {cityRepository.removeCities()}
                     )
-                    //cityRepository.removeCity("Minas Morgul")
                 }
             }
         }

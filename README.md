@@ -14,5 +14,11 @@ https://github.com/Kotlin/KEEP/blob/master/notes/value-classes.md
 https://kotlinlang.org/docs/lambdas.html#lambda-expressions-and-anonymous-functions
 https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier#(androidx.compose.ui.Modifier).selectable(kotlin.Boolean,kotlin.Boolean,androidx.compose.ui.semantics.Role,androidx.compose.foundation.interaction.MutableInteractionSource,kotlin.Function0)
 
+I had an issue with the text boxes remaining highlighted even after removing entries, I
+wound up consulting duck.ai and confirming that .background won't update unless I used a
+mutableStateOf(). So I messed around with that for a while, discovered that I can't put
+it into the declaration of my data class, and then figured I tried giving my data class
+its own body and instantiating it there. That worked super-duper well.
+
 ## Verbal Collaboration
 `N/A` 
