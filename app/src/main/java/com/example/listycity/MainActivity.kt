@@ -4,15 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -20,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.listycity.ui.theme.ListyCityTheme
@@ -28,37 +28,38 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 
+data class City(val name: String, var isSelected: Boolean = false)
 class CityRepository {
     //
     private val _cities = mutableStateListOf(
-        "Minas Tirith", "Minas Morgul", "The Shire",
-        "Baradur", "Osgiliath", "Lothlorien"
+        City("Minas Tirith"), City("Minas Morgul"), City("The Shire"),
+        City("Baradur"), City("Osgiliath"), City("Lothlorien")
     )
 
-    val cities: List<String> get() = _cities
+    val cities: List<City> get() = _cities
 
-    fun addCity(city: String) {
+    fun addCity(city: City) {
         //
         _cities.add(city)
     }
 
-    fun removeCity(city: String) {
-        /* This method removes a city from the array.
-         * city: is a String matching a city already in the array.
+    fun removeCities() {
+        /* This method removes all selected cities from the array.
+         *
          */
-        if (_cities.isNotEmpty()) {
-            _cities.remove(city)
-        }
+        if (_cities.isNotEmpty()) _cities.removeAll { it.isSelected }
     }
 }
 
 
 @Composable
 fun CityListScreen(
-    cities: List<String>,
+    cities: List<City>,
     modifier: Modifier = Modifier,
-    onAddCity: (String) -> Unit
+    onAddCity: (City) -> Unit,
+    onRemoveCity: () -> Unit
 ) {
     var newCityName by remember {mutableStateOf("") }
     var showNewCity by remember {mutableStateOf(false)}
@@ -80,9 +81,10 @@ fun CityListScreen(
                     //    onAddCity(newCityName)
                     //    newCityName = ""
                     //}
+                    onRemoveCity()
                 }
             ) {
-                Text("Remove City")
+                Text("Remove Selected Cities")
             }
         }
         if (showNewCity) {
@@ -96,7 +98,7 @@ fun CityListScreen(
                 Button(
                     onClick = {
                         if (newCityName.isNotBlank()) {
-                            onAddCity(newCityName)
+                            onAddCity(City(newCityName))
                             newCityName = ""
                         }
                         showNewCity = false
@@ -109,24 +111,30 @@ fun CityListScreen(
         //Spacer(modifier = Modifier.width(8.dp))
 
         LazyColumn(modifier = modifier
-            .fillMaxSize()) {
+            .fillMaxSize()
+            .selectableGroup()) {
             //
             //
             items(cities) { city ->
                 CityRow(city = city)
+                Text(text=city.isSelected.toString())
             }
         }
     }
 }
 
 @Composable
-fun CityRow(city: String) {
+fun CityRow(city: City) {
     Text(
-        text = city,
+        text = city.name,
         fontSize = 28.sp,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 18.dp, vertical = 14.dp)
+            .background(if (city.isSelected) Color.LightGray else Color.Transparent) // I had to fight this inline if statement.
+            .selectable(
+                selected = city.isSelected,
+                onClick = { city.isSelected = !city.isSelected })
     )
 }
 
@@ -143,7 +151,8 @@ class MainActivity : ComponentActivity() {
                     CityListScreen(
                         cities = cityRepository.cities,
                         modifier = Modifier.padding(innerPadding),
-                        onAddCity = { cityRepository.addCity(it) }
+                        onAddCity = { cityRepository.addCity(it) },
+                        onRemoveCity = {cityRepository.removeCities()}
                     )
                     //cityRepository.removeCity("Minas Morgul")
                 }
@@ -151,20 +160,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-/*@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ListyCityTheme {
-        Greeting("Android")
-    }
-}
-*/
